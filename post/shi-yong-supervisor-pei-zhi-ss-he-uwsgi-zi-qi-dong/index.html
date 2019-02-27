@@ -68,7 +68,7 @@
             </h2>
             <div class="post-info">
               <time class="post-time">
-                · 2019-02-24 ·
+                · 2019-02-23 ·
               </time>
               
                 <a href="https://king3200.github.io/tag/rP1THuk6k" class="post-tags">
@@ -82,16 +82,21 @@
             </div>
             <div class="post-content">
               <ol>
-<li>首先pip安装的supervisor是python2版本，可以使用命令<br><code>pip install git+https://github.com/Supervisor/supervisor.git#egg=supervisor</code><br>安装python3版本的supervisor。</li>
-<li>执行echo_supervisord_conf &gt; /etc/supervisord.conf生成默认配置文件</li>
-<li>编辑supervisor.conf配置文件，增加命令项目：<pre><code>[program:uwsgi]
+<li><p>首先pip安装的supervisor是python2版本，可以使用命令<br><code>pip install git+https://github.com/Supervisor/supervisor.git#egg=supervisor</code><br>安装python3版本的supervisor。</p>
+</li>
+<li><p>执行echo_supervisord_conf &gt; /etc/supervisord.conf生成默认配置文件</p>
+</li>
+<li><p>编辑supervisor.conf配置文件，增加命令项目：</p>
+<pre><code>[program:uwsgi]
 command = /home/web/py3env/bin/uwsgi --ini /home/web/uwsgi_conf.ini
 autostart = true
 startsecs = 10
 autorestart = true
 startretries = 3
-stdout_logfile = /var/log/uwsgi.log</code></pre>注意如果uwsgi运行于python virtualenv中，command字段需指定为virtualenv的bin目录中的uwsgi执行文件，这样每次启动时就是调用的虚拟环境了</li>
-<li>配置SS的配置文件为：<pre><code>[program:ssserver]
+stdout_logfile = /var/log/uwsgi.log</code></pre><p>注意如果uwsgi运行于python virtualenv中，command字段需指定为virtualenv的bin目录中的uwsgi执行文件，这样每次启动时就是调用的虚拟环境了</p>
+</li>
+<li><p>配置SS的配置文件为：</p>
+<pre><code>[program:ssserver]
 command = /root/.go/bin/shadowsocks-server -c config.json -u
 directory = /root/.go/bin/
 user = root
@@ -99,6 +104,8 @@ autostart = true
 autorestart = true
 stdout_logfile = /var/log/supervisor/ssserver.log
 stderr_logfile = /var/log/supervisor/ssserver_err.log</code></pre></li>
+<li><p>启动supervisor：<br><code>supervisord -c /etc/supervisor/supervisord.conf</code></p>
+</li>
 </ol>
 
             </div>
