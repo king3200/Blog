@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>windows apache部署django应用 | 泰达的空间</title>
+<link rel="shortcut icon" href="https://king3200.github.io/favicon.ico">
+<link rel="stylesheet" href="https://king3200.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://king3200.github.io">
+  <img class="avatar" src="https://king3200.github.io/images/avatar.png" alt="" width="80px" height="80px">
+  </a>
+  <h1 class="site-title">
+    泰达的空间
+  </h1>
+  <p class="site-description">
+    用来记录一堆堆东西
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://github.com/king3200" class="menu">
+          Github
+        </a>
+      
+    
+  </div>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              windows apache部署django应用
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-02-28 ·
+              </time>
+              
+                <a href="https://king3200.github.io/tag/OdlGpDUaV" class="post-tags">
+                  # django
+                </a>
+              
+            </div>
+            <div class="post-content">
+              <p>这里记录一下在windows服务器上部署公司项目的过程<br>另外使用IIS部署django应用坑实在太多，所以放弃了IIS使用相对配置简单的apache<br>linux平台上相关的包管理器用习惯了，实在不想去一个一个去官网下载软件怎么办？windows平台的Chocolatey提供了相似的软件包管理，可以通过chocolatey进行安装和卸载的统一管理。</p>
+<ol>
+<li>安装windows平台的包管理器Chocolatey<br>使用管理员权限打开powershell，输入一下命令<br><code>iex ((new-object net.webclient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))</code><br>命令执行完成后，输入choco命令，如果显示了Chocolatey版本号，说明安装顺利完成<br>1.1. Chocolatey常用命令<br>搜索软件包<br><code>choco search [关键字]</code><br>安装软件包<br><code>choco install [软件包名称]</code><br>更新软件包<br><code>choco upgrade [软件包名称]</code><br>卸载软件包<br><code>choco uninstall [软件包名称]</code><br>另外Chocolatey还提供了图形界面以方便使用<br><code>choco install chocolateygui</code></li>
+<li>使用choco安装mysql<br>有了choco，安装mysql就很轻松了，直接执行<br><code>choco install mysql</code><br>然后打开命令行输入<code>services.msc</code>打开服务管理，运行mysql，搞定<br>2.1 修改mysql默认字符集<br>打开mysql安装路径，默认路径C:\tools\mysql\current，修改my.ini配置文件<br>增加设置<pre><code>[mysqld]
+character_set_server=utf8
+[mysql]
+default-character-set=utf8
+[client]
+default-character-set=utf8</code></pre>重启mysql服务，登陆mysql控制台，输入<br><code>SHOW VARIABLES LIKE &#39;character_set_%&#39;;</code><br><code>SHOW VARIABLES LIKE &#39;collation_%&#39;;</code><br>确认字符集都成功改为utf8</li>
+<li>使用choco安装apache<br>由于安装pache或者nginx时会自动监听80端口，如果80端口被其他应用占用，会出现安装失败的情况，所以需要在安装时制定另外的接口，可参考以下命令<br>/installLocation: 安装路径<br>/port: 默认端口<br><code>choco install apache-httpd --params &#39;&quot;/installLocation:C:\HTTPD /port:8080&quot;&#39;</code><br>打开浏览器访问<a href="http://localhost:8080">http://localhost:8080</a> 确认是否成功安装apache</li>
+<li>下载mod_wsgi<br>下载地址<a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">http://www.lfd.uci.edu/~gohlke/pythonlibs/</a><br>根据系统的python版本和电脑信息下载对应版本的mod_wsgi， 笔者使用的python3.7，64位系统，所以下载这个<br><img src="https://ws1.sinaimg.cn/large/006tKfTcly1g0m49twudlj30rb0f478w.jpg" alt=""><br>下载完成后，输入命令进行安装<br><code>pip install mod_wsgi-xxxx-xxxxx.whl</code><br>安装完成后输入<code>mod_wsgi-express module-config</code><br>会显示LoadFile，LoadModule，WSGIPythonHome三个变量的值，复制下来，一会用</li>
+<li>配置Apache和Django<br>打开Apache配置文件conf/httpd.conf文件<br>在配置文件末尾加上之前复制的LoadFile，LoadModule，WSGIPythonHome三个变量<br>```<br>LoadFile &quot;c:/python36/python36.dll&quot;<br>LoadModule wsgi_module &quot;c:/python36/lib/site-packages/mod_wsgi/server/mod_wsgi.cp37-win_amd64.pyd&quot;<br>WSGIPythonHome &quot;c:/python36&quot;</li>
+</ol>
+<p>#指定django项目目录中的wsgi.py文件<br>WSGIScriptAlias / d:/project/demo/demo/wsgi.py </p>
+<p>#指定项目目录和目录权限<br>WSGIPythonPath  d:/project/demo<br>&lt;Directory d:/project/demo&gt;<br><Files wsgi.py><br>    Require all granted<br></Files><br></Directory> </p>
+<p>#指定静态文件地址<br>Alias /static D:/project/demo/static<br>&lt;Directory D:/project/demo/static&gt;<br>    AllowOverride None<br>    Options None<br>    Require all granted<br></Directory> </p>
+<p>#指定上传文件路径，假设使用django默认设置的media作为上传目录<br>Alias /media D:/project/demo/media<br>&lt;Directory D:/project/demo/media&gt;<br>    AllowOverride None<br>    Options None<br>    Require all granted<br></Directory> </p>
+<pre><code>然后对django项目的setting.py文件进行修改</code></pre><p>DEBUG = False<br>ALLOWED_HOSTS = [&#39;*&#39;]<br>```<br>完成配置<br>重启apache，访问localhost:8080<br>done</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://king3200.github.io/post/shi-yong-supervisor-pei-zhi-ss-he-uwsgi-zi-qi-dong">
+              <h3 class="post-title">
+                使用supervisor配置ss和uwsgi自启动
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by TidusWJ
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
