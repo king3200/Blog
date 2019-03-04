@@ -84,9 +84,9 @@
               <ol>
 <li><p>首先pip安装的supervisor是python2版本，可以使用命令<br><code>pip install git+https://github.com/Supervisor/supervisor.git#egg=supervisor</code><br>安装python3版本的supervisor。</p>
 </li>
-<li><p>执行echo_supervisord_conf &gt; /etc/supervisord.conf生成默认配置文件</p>
+<li><p>执行echo_supervisord_conf &gt; /etc/supervisord.conf生成默认配置文件，默认生成的配置文件中include项目为包含的管理进程的目录地址，默认目录为/etc/supervisord.conf/，多个项目，可通过在这个目录下增加ini文件进行管理。</p>
 </li>
-<li><p>编辑supervisor.conf配置文件，增加命令项目：</p>
+<li><p>进入supervisor.conf目录，生成新的配置文件project.ini配置文件，增加命令项目：</p>
 <pre><code>[program:uwsgi]
 command = /home/web/py3env/bin/uwsgi --ini /home/web/uwsgi_conf.ini
 autostart = true
@@ -104,9 +104,18 @@ autostart = true
 autorestart = true
 stdout_logfile = /var/log/supervisor/ssserver.log
 stderr_logfile = /var/log/supervisor/ssserver_err.log</code></pre></li>
-<li><p>启动supervisor：<br><code>supervisord -c /etc/supervisor/supervisord.conf</code></p>
+<li><p>配置celery<br>supervisor.conf目录下新增celery.ini配置文件，编辑项目如下<br>```<br>[program:celery.worker]<br>;指定运行目录<br>directory=/home/web<br>;运行目录下执行命令，如果运行在虚拟目录下，需指定virtualenv环境下的celery运行文件<br>command=celery -A yshblog worker --loglevel info --logfile celery_worker.log</p>
 </li>
 </ol>
+<p>;启动设置<br>numprocs=1          ;进程数<br>autostart=true      ;当supervisor启动时,程序将会自动启动<br>autorestart=true    ;自动重启</p>
+<p>;停止信号,默认TERM<br>;中断:INT (类似于Ctrl+C)(kill -INT pid)，退出后会将写文件或日志(推荐)<br>;终止:TERM (kill -TERM pid)<br>;挂起:HUP (kill -HUP pid),注意与Ctrl+Z/kill -stop pid不同<br>;从容停止:QUIT (kill -QUIT pid)<br>stopsignal=INT</p>
+<pre><code>如果celery还有定时任务的话，还可以在该配置文件下增加celery.beat的相关项目，进程将根据配置文件内容顺序启动。</code></pre><p>[program:celery.beat]<br>;指定运行目录<br>directory=/home/web<br>;运行目录下执行命令<br>command=celery -A yshblog worker --loglevel info --logfile celery_beat.log</p>
+<p>;启动设置<br>numprocs=1          ;进程数<br>autostart=true      ;当supervisor启动时,程序将会自动启动<br>autorestart=true    ;自动重启</p>
+<p>;停止信号<br>stopsignal=INT<br>```</p>
+<ol start="6">
+<li>启动supervisor：<br><code>supervisord -c /etc/supervisor/supervisord.conf</code></li>
+</ol>
+<p>成功启动后输入命令supervisorctl可进入supervisor的控制台，输入reload即可热加载配置文件</p>
 
             </div>
           </article>
