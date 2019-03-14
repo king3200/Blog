@@ -1,0 +1,116 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>django restful实践总结-0：项目总结开坑 | 泰达的空间</title>
+<link rel="shortcut icon" href="https://king3200.github.io/favicon.ico">
+<link rel="stylesheet" href="https://king3200.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://king3200.github.io">
+  <img class="avatar" src="https://king3200.github.io/images/avatar.png" alt="" width="80px" height="80px">
+  </a>
+  <h1 class="site-title">
+    泰达的空间
+  </h1>
+  <p class="site-description">
+    用来记录一堆堆东西
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://github.com/king3200" class="menu">
+          Github
+        </a>
+      
+    
+  </div>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              django restful实践总结-0：项目总结开坑
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2019-03-06 ·
+              </time>
+              
+                <a href="https://king3200.github.io/tag/OdlGpDUaV" class="post-tags">
+                  # django
+                </a>
+              
+            </div>
+            <div class="post-content">
+              <p>在刚刚完成的一个django项目中，由于工期比较赶，很多地方其实还有优化和重构的空间，借这个专题，也总结一下项目收获和踩过的坑。<br>本次项目主要用到的包大致如下：</p>
+<p>celery  #提供分布式任务队列和计时任务<br>coreapi==2.3.3  #提供结构化文档生成<br>Django==2.1.4<br>django-filter==2.0.0 #提供简单的uri资源访问的过滤方案<br>django-guardian==1.4.9 #django权限相关增强插件<br>django-mptt==0.9.1#为model提供树形存储结构支持<br>djangorestframework==3.9.0 #提供完整的restful访问框架<br>djangorestframework-jwt==1.11.0 #提供jwt登陆支持<br>djangorestframework-recursive==0.1.2 #提供drf访问序列化资源时的递归功能<br>Pillow==5.3.0 #常规图形处理库，图片上传需要用到<br>PyMySQL==0.9.2 #python3版本的mysql连接库<br>requests==2.20.1 #这个就不用介绍了吧。。。</p>
+<p>那么先从项目配置开始：<br>1、python3配置mysql链接库<br>python2时代常用的mysql-python在3.0之后的版本已无法使用，所以需要PyMySQL库进行替换，直接引入PymySQL是没法使用的，需要在项目的<strong>init</strong>.py中添加:</p>
+<pre><code>import pymysql
+pymysql.install_as_MySQLdb()</code></pre><p>方可正常使用</p>
+<p>2、Pycharm配置远程联调服务器<br>本次项目由于需要远程协作，所以在阿里云上部署了一台开发机用作联调用。那么就存在一个本地代码与远程开发机代码同步的问题了。怎么让本地代码用最简单的方式同步到远程服务器呢？这里提供两种方式：<br>第一种，git；需要更新的代码通过git push到远程机器，由于django dev server有自动重载的功能，所以push之后可以实时看到改变<br>第二种，在pycharm配置SFTP；在远程服务器上配置SFTP，pycharm支持SFTP同步数据，修改完某个文件后右键提交就可以了</p>
+<p>3、settings设置<br>LANGUAGE_CODE = &#39;zh-hans&#39;   #设置中文<br>TIME_ZONE = &#39;Asia/Shanghai&#39;  #设置中国时区<br>USE_I18N = True<br>USE_L10N = True<br>USE_TZ = False  #如果没有全球化需求可以关闭时区设置<br>设置正确的静态目录<br>STATIC_URL = &#39;/static/&#39;<br>MEDIA_URL = &#39;/media/&#39;<br>MEDIA_ROOT = os.path.join(BASE_DIR, &#39;media&#39;).replace(&#39;\&#39;, &#39;/&#39;)+&#39;/&#39;<br>STATIC_ROOT = os.path.join(BASE_DIR, &#39;collectedstatic&#39;)<br>STATICFILES_DIRS = [<br>    os.path.join(BASE_DIR, &quot;static&quot;),<br>    MEDIA_ROOT,<br>]</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://king3200.github.io/post/windows-apache-bu-shu-django-ying-yong">
+              <h3 class="post-title">
+                windows apache部署django应用
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by TidusWJ
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
